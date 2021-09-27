@@ -21,40 +21,38 @@ void setup()
     strip.show();
     mainos_init();
     WebServerInit();
-    std::vector<uint8_t> bytes{0,1,5,0,0,0, 10, 255, 126, 128, 8};
-    auto command = CommandService.ParseBytes(bytes)[0];
-    Serial.println(command.toString().c_str());
 }
 
 void loop()
 {
-    //server.handleClient();
+    server.handleClient();
     delay(10);
 }
 
 void onPost(){
-    
+    server.arg("plain");
+
 }
 
 void WebServerInit(){
-//     Serial.println("Connecting to ");
-//     Serial.println(ssid);
+    Serial.println("Connecting to ");
+    Serial.println(ssid);
 
-//     //connect to your local wi-fi network
-//     WiFi.begin(ssid, password);
+    //connect to your local wi-fi network
+    WiFi.begin(ssid, password);
 
-//     //check wi-fi is connected to wi-fi network
-//     while (WiFi.status() != WL_CONNECTED)
-//     {
-//         delay(1000);
-//         Serial.print(".");
-//     }
-//     Serial.println("");
-//     Serial.println("WiFi connected..!");
-//     Serial.print("Got IP: ");
-//     Serial.println(WiFi.localIP());
+    //check wi-fi is connected to wi-fi network
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        delay(1000);
+        Serial.print(".");
+    }
+    Serial.println("");
+    Serial.println("WiFi connected..!");
+    Serial.print("Got IP: ");
+    Serial.println(WiFi.localIP());
 
-//     server.on("/post", HTTP_POST, onPost);
-//     server.begin();
-//     Serial.println("HTTP server started");
+    server.on("/post", HTTP_POST, onPost);
+    server.begin();
+    Serial.println("HTTP server started");
 }

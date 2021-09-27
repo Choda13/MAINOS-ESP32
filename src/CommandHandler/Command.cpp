@@ -1,3 +1,4 @@
+#include "../../include/MAINOS.h"
 #include "../../include/CommandHandler/Command.h"
 #include "../../include/TypeConversions/TypeConversions.h"
 #include <iostream>
