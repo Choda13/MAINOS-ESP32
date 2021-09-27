@@ -1,0 +1,124 @@
+#include "../../include/CommandHandler/Command.h"
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <cstdlib>
+
+std::string int_to_string(int value) {
+	std::stringstream s;
+	s << value;
+	return s.str();
+}
+
+template< typename T >
+std::string Command::int_to_hex(T i)
+{
+	std::stringstream stream;
+	stream << std::setfill('0') << std::setw(sizeof(T) * 2)
+		<< std::hex << (int)i;
+	return stream.str();
+}
+
+//TODO: Set value to all zeros
+template<typename T>
+T Command::bytes_to_type(std::vector<uint8_t>bytes, bool ignoreSize) {
+	T value;
+	std::copy(bytes.data(), bytes.data() + sizeof(T), reinterpret_cast<uint8_t*>(&value));
+	//if (!ignoreSize && sizeof(T) != bytes.size())
+		//Serial print "Exception at bytes_to_type(std::vector<uint8_t>bytes): bytes size doesnt equal the size of type T"
+	return value;
+}
+
+template<typename T>
+std::vector<uint8_t> Command::type_to_bytes(T value) {
+	std::vector<uint8_t> result(sizeof(T));
+	std::copy(reinterpret_cast<uint8_t*>(&value), reinterpret_cast<uint8_t*>(&value) + sizeof(T), result.data());
+	return result;
+}
+
+Command::Command(std::vector<uint8_t> bytes) {
+	*this = Command::Decode(bytes);
+}
+
+Command::Command(uint8_t ApiID, uint8_t CommandID, std::vector<uint8_t>Arguments) {
+	this->ApiID = ApiID;
+	this->CommandID = CommandID;
+	this->Arguments = Arguments;
+}
+
+std::vector<uint8_t> Command::Encode() {
+	return Command::Encode(*this);
+}
+
+std::vector<uint8_t> Command::Encode(Command command) {
+	int argsSize = command.Arguments.size();
+	std::vector<uint8_t> Result;
+	std::vector<uint8_t> sizeInBytes = Command::type_to_bytes<int>(argsSize);
+	Result.push_back(command.ApiID);
+	Result.push_back(command.CommandID);
+	Result.insert(Result.end(), sizeInBytes.begin(), sizeInBytes.end());
+	Result.insert(Result.end(), command.Arguments.begin(), command.Arguments.end());
+
+	return Result;
+}
+
+Command Command::Decode(std::vector<uint8_t> data) {
+	int dataSize = data.size();
+	int position = 0;
+
+	//Creates zero initialized Command with isCommandValid flag set to zero if there is not enough data to create object
+	if (dataSize < HEADER_SIZE) {
+		auto com = Command(0, 0, std::vector<uint8_t>());
+		com.isCommandValid = false;
+		return com;
+	}
+	
+	uint8_t ApiID = Command::bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ApiID)));
+	position += sizeof(ApiID);
+
+	uint8_t CommandID = Command::bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(CommandID)));
+	position += sizeof(CommandID);
+
+	unsigned int ArgsSize = Command::bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ArgsSize)));
+	position += sizeof(ArgsSize);
+
+	//Creates zero initialized Command with isCommandValid flag set to zero if there is not enough data to create object
+	if (data.size() - HEADER_SIZE < ArgsSize) {
+		auto com = Command(0, 0, std::vector<uint8_t>());
+		com.isCommandValid = false;
+		return com;
+	}
+		
+	std::vector<uint8_t> Arguments;
+	if (ArgsSize)
+		Arguments.insert(Arguments.end(), data.begin() + position, data.begin() + position + ArgsSize);
+
+	return Command(ApiID, CommandID, Arguments);
+}
+
+std::string Command::toString() {
+	std::string result = "";
+	std::string hexvalues = "";
+	
+	result += "API ID: " + int_to_string(ApiID) + "\n";
+	result += "Command ID: " + int_to_string(CommandID) + "\n";
+	result += "Size of args: " + int_to_string(Arguments.size()) + "\n";
+	result += "Hexadecimal representaion of arguments:\n";
+	
+	for (unsigned int i = 0; i < Arguments.size(); i++) {
+		hexvalues += int_to_hex<uint8_t>(Arguments.at(i));
+		switch (i % 8) {
+			case 7:hexvalues += '\n'; break;
+			case 3:	hexvalues += "  "; break;
+			default:hexvalues += ' ';
+		}
+	}
+	return result + hexvalues;
+}
+
+int Command::size() {
+	return HEADER_SIZE + this->Arguments.size();
+}
+
+//TODO: Make better Header parser
