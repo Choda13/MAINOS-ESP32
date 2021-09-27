@@ -1,3 +1,4 @@
+#include "../../include/MAINOS.h"
 #include "../../include/CommandHandler/Command.h"
 #include <string>
 #include <iostream>
@@ -11,31 +12,8 @@ std::string int_to_string(int value) {
 	return s.str();
 }
 
-template< typename T >
-std::string Command::int_to_hex(T i)
-{
-	std::stringstream stream;
-	stream << std::setfill('0') << std::setw(sizeof(T) * 2)
-		<< std::hex << (int)i;
-	return stream.str();
-}
-
 //TODO: Set value to all zeros
-template<typename T>
-T Command::bytes_to_type(std::vector<uint8_t>bytes, bool ignoreSize) {
-	T value;
-	std::copy(bytes.data(), bytes.data() + sizeof(T), reinterpret_cast<uint8_t*>(&value));
-	//if (!ignoreSize && sizeof(T) != bytes.size())
-		//Serial print "Exception at bytes_to_type(std::vector<uint8_t>bytes): bytes size doesnt equal the size of type T"
-	return value;
-}
 
-template<typename T>
-std::vector<uint8_t> Command::type_to_bytes(T value) {
-	std::vector<uint8_t> result(sizeof(T));
-	std::copy(reinterpret_cast<uint8_t*>(&value), reinterpret_cast<uint8_t*>(&value) + sizeof(T), result.data());
-	return result;
-}
 
 Command::Command(std::vector<uint8_t> bytes) {
 	*this = Command::Decode(bytes);
@@ -54,7 +32,7 @@ std::vector<uint8_t> Command::Encode() {
 std::vector<uint8_t> Command::Encode(Command command) {
 	int argsSize = command.Arguments.size();
 	std::vector<uint8_t> Result;
-	std::vector<uint8_t> sizeInBytes = Command::type_to_bytes<int>(argsSize);
+	std::vector<uint8_t> sizeInBytes = type_to_bytes<int>(argsSize);
 	Result.push_back(command.ApiID);
 	Result.push_back(command.CommandID);
 	Result.insert(Result.end(), sizeInBytes.begin(), sizeInBytes.end());
@@ -74,13 +52,13 @@ Command Command::Decode(std::vector<uint8_t> data) {
 		return com;
 	}
 	
-	uint8_t ApiID = Command::bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ApiID)));
+	uint8_t ApiID = bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ApiID)));
 	position += sizeof(ApiID);
 
-	uint8_t CommandID = Command::bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(CommandID)));
+	uint8_t CommandID = bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(CommandID)));
 	position += sizeof(CommandID);
 
-	unsigned int ArgsSize = Command::bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ArgsSize)));
+	unsigned int ArgsSize = bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ArgsSize)));
 	position += sizeof(ArgsSize);
 
 	//Creates zero initialized Command with isCommandValid flag set to zero if there is not enough data to create object
@@ -107,7 +85,7 @@ std::string Command::toString() {
 	result += "Hexadecimal representaion of arguments:\n";
 	
 	for (unsigned int i = 0; i < Arguments.size(); i++) {
-		hexvalues += int_to_hex<uint8_t>(Arguments.at(i));
+		hexvalues += byte_to_hex<uint8_t>(Arguments.at(i));
 		switch (i % 8) {
 			case 7:hexvalues += '\n'; break;
 			case 3:	hexvalues += "  "; break;
