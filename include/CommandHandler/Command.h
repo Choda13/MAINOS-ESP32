@@ -1,7 +1,7 @@
 #pragma once
+#include <iostream>
 #include <cstdint>
 #include <vector>
-#include <iostream>
 
 //TODO: MAKE FLEXIBLE AND EASILY CHANGING COMMAND HEADER SIZE
 //TODO: Make header parser
@@ -35,15 +35,4 @@ public:
 
 	//Convert byte array to class object equivalent if possible
 	static Command Decode(std::vector<uint8_t> data);
-
-	//Convert variable of type T to its byte array equivalent
-	template <typename T>
-	static std::vector<uint8_t> type_to_bytes(T value);
-
-	//Convert array of bytes to variable of type T if possible
-	template <typename T>
-	static T bytes_to_type(std::vector<uint8_t>bytes, bool ignoreSize=true);
-
-	template< typename T >
-	static std::string int_to_hex(T i);
 };

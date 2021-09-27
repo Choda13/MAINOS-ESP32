@@ -9,11 +9,6 @@ commserv::CommandHandler::CommandHandler(std::vector<api::API>APIList) {
 }
 
 std::vector<Command> commserv::CommandHandler::ParseBytes(std::vector<uint8_t>data) {
-	int argsSize;
-	uint8_t ApiID;
-	uint8_t CommandID;
-	std::vector<uint8_t> Arguments;
-
 	std::vector<Command> result;
 	int dataSize = data.size();
 	int i = 0;
@@ -77,50 +72,3 @@ int commserv::CommandHandler::UnregisterAPI(unsigned int index) {
 	APIList.erase(APIList.begin() + index);
 	return codes::StatusCodes::Success;
 }
-
-//OLD
-//std::vector<Command> commserv::CommandHandler::ParseBytes(std::vector<uint8_t>data) {
-//	int argsSize;
-//	uint8_t ApiID;
-//	uint8_t CommandID;
-//	std::vector<uint8_t> Arguments;
-//
-//	std::vector<Command> result;
-//	uint8_t* dataPtr = data.data();
-//	int dataSize = data.size();
-//	int i = 0;
-//
-//	//ApiID, CommandID, and argsSize are actually headers
-//	while (i < dataSize) {
-//		if (i + Command::HEADER_SIZE >= dataSize) {
-//			std::cout << "Nedovoljno podataka za sledecu komandu" << std::endl;
-//			break;
-//		}
-//		i += Command::HEADER_SIZE;
-//		//Extract ApiID
-//		std::copy(dataPtr, dataPtr + Command::API_ID_SIZE, reinterpret_cast<uint8_t*>(&ApiID));
-//		dataPtr += Command::API_ID_SIZE;
-//
-//		//Extract CommandID
-//		std::copy(dataPtr, dataPtr + Command::COMMAND_ID_SIZE, reinterpret_cast<uint8_t*>(&CommandID));
-//		dataPtr += Command::COMMAND_ID_SIZE;
-//
-//		//Extract argsSize
-//		std::copy(dataPtr, dataPtr + Command::ARGS_SIZE, reinterpret_cast<uint8_t*>(&argsSize));
-//		dataPtr += Command::ARGS_SIZE;
-//
-//		if (i + argsSize > dataSize) {
-//			std::cout << "Nedovoljno podataka za argumente ove komande" << std::endl;
-//			break;
-//		}
-//		i += argsSize;
-//		//Extract Arguments
-//		Arguments = std::vector<uint8_t>(argsSize);
-//		std::copy(dataPtr, dataPtr + argsSize, reinterpret_cast<uint8_t*>(Arguments.data()));
-//		dataPtr += argsSize;
-//
-//		result.push_back(Command{ ApiID, CommandID, Arguments });
-//		Arguments.clear();
-//	}
-//	return result;
-//}
