@@ -6,8 +6,8 @@
 #include <WiFi.h>
 
 /*Put your SSID & Password*/
-const char *ssid = "ZTE_H168N87DF8C"; // Enter SSID here
-const char *password = "mojnet021";   //Enter Password here
+const char *ssid = "Test"; // Enter SSID here
+const char *password = "Test";   //Enter Password here
 
 LedStrip strip(5, 60);
 
