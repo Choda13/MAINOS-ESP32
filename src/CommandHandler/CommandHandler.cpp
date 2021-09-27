@@ -36,7 +36,7 @@ std::vector<api::APIResponse> commserv::CommandHandler::HandleCommands(std::vect
 std::vector<api::APIResponse> commserv::CommandHandler::HandleCommands(std::vector<Command> commands) {
 	ResponseList.clear();
 	std::vector<Command>::iterator it = commands.begin();
-	for (it; it != commands.end(); it++) {
+	for (; it != commands.end(); it++) {
 		uint8_t id = it->ApiID;
 		if (id >= APIList.size()) {
 			std::string msg = "API not found";
