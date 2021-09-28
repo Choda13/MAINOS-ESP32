@@ -19,6 +19,64 @@ api::APIResponse LedAPI::LedAPI::ExecuteCommand(Command command)
         case CommandCodes::removePixel:break;
         case CommandCodes::changePixel:break;
         case CommandCodes::show:break;
-        default: return api::APIResponse(codes::NotFound, command);
+        default: return api::APIResponse(codes::NotFound, command);break;
     }
+    return api::APIResponse(codes::NotFound, command);
+}
+
+api::APIResponse LedAPI::LedAPI::addStrip(Command command)
+{
+    //Argument parsing
+    //Leds.addStrip(parsedArgs);
+}
+api::APIResponse LedAPI::LedAPI::listStrips(Command command)
+{
+    api::APIResponse response(command);
+    std::string msg="";
+    int count=0;
+    for (auto &&i : this->Leds.strips)
+    {
+        msg+="\nIndex: " + count;
+        msg+=i.toString();
+        count++;
+    }
+    response.responseData = std::vector<uint8_t>(msg.begin(), msg.end());
+    return response;
+}
+api::APIResponse LedAPI::LedAPI::removeStrip(Command command)
+{
+
+}
+api::APIResponse LedAPI::LedAPI::showStripData(Command command)
+{
+    std::string msg="";
+    api::APIResponse response(command);
+    response.statusCode = codes::NotFound;
+    //Parse arguments
+    //Check if args are valid
+    //Retreive strip data
+    //return response
+    return response;
+}
+
+api::APIResponse LedAPI::LedAPI::changeDefault(Command command)
+{
+
+}
+
+api::APIResponse LedAPI::LedAPI::addPixel(Command command)
+{
+
+}
+api::APIResponse LedAPI::LedAPI::removePixel(Command command)
+{
+
+}
+api::APIResponse LedAPI::LedAPI::changePixel(Command command)
+{
+
+}
+api::APIResponse LedAPI::LedAPI::show(Command command)
+{
+
 }
