@@ -19,6 +19,7 @@ namespace LedAPI
         addStrip,
         removeStrip,
         listStrips,
+        showStripData,
         changeDefault,
         addPixel,
         removePixel,
@@ -45,6 +46,7 @@ namespace LedAPI
         api::APIResponse addStrip(Command command);        //TODO: add arguments
         api::APIResponse listStrips(Command command);
         api::APIResponse removeStrip(Command command);     //TODO: add arguments
+        api::APIResponse showStripData(Command command);
         api::APIResponse changeDefault(Command command);   //TODO: add arguments
 
         api::APIResponse addPixel(Command command);        //TODO: add arguments
