@@ -1,7 +1,7 @@
 #pragma once
 #include "FastLED.h"
 #include <vector>
-
+#include <string>
 
 //TODO: Return something meaningful instead of void
 class LedStrip
@@ -11,12 +11,13 @@ public:
     std::vector<CRGB> pixels;
     CLEDController* controller;
     
-    LedStrip();
     LedStrip(uint8_t dataPin);
     LedStrip(uint8_t dataPin, int numOfLeds);
     LedStrip(uint8_t dataPin, std::vector<CRGB> data);
     LedStrip(uint8_t dataPin, CRGB* data, int numOfLeds);
     //LedStrip() with chipset option
+
+    std::string toString();
 
     void updatePixels();
 
