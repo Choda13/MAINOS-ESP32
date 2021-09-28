@@ -10,7 +10,6 @@ namespace LedAPI
     //Command overloading can be done in two ways:
     //  1) diffrent command code for each overload,
     //  2) diffrent number of bytes of arguments every overloaded command recives
-
     enum CommandCodes
     {
         //Api specific commands
@@ -31,7 +30,8 @@ namespace LedAPI
     {
     public:
         LedLib::Led Leds;
-        LedStrip defaultStrip;
+        LedStrip *defaultStrip = NULL;
+        std::string APIName = "Led API";
 
         LedAPI();
         api::APIResponse ExecuteCommand(Command command);

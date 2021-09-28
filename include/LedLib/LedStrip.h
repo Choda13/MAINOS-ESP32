@@ -11,6 +11,7 @@ public:
     std::vector<CRGB> pixels;
     CLEDController* controller;
     
+    LedStrip();
     LedStrip(uint8_t dataPin);
     LedStrip(uint8_t dataPin, int numOfLeds);
     LedStrip(uint8_t dataPin, std::vector<CRGB> data);
