@@ -9,6 +9,7 @@ namespace api {
 	class APIResponse;
 	class API;
 
+	//TODO: Expand API base class
 	//Abstract class
 	class API {
 	public:
