@@ -1,5 +1,26 @@
 #include "../include/LedLib/LedLib.h"
 
+LedLib::Led::Led()
+{
+}
+LedLib::Led::Led(uint8_t dataPin)
+{
+    strips.push_back(LedStrip(dataPin));
+}
+LedLib::Led::Led(LedStrip strip)
+{
+    strips.push_back(strip);
+}
+LedLib::Led::Led(std::vector<LedStrip> strips)
+{
+    this->strips.insert(this->strips.end(), strips.begin(), strips.end());
+}
+LedLib::Led::Led(LedStrip* strips, unsigned int numOfStrips)
+{
+    for(auto i=0; i< numOfStrips; i++)
+        this->strips.push_back(strips[i]);
+}
+
 void LedLib::Led::addStrip(uint8_t dataPin)
 {
     strips.push_back(LedStrip(dataPin));

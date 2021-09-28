@@ -13,6 +13,12 @@ namespace LedLib
     public:
         std::vector<LedStrip> strips;
 
+        Led();
+        Led(LedStrip strip);
+        Led(uint8_t dataPin);
+        Led(std::vector<LedStrip> strips);
+        Led(LedStrip* strips, unsigned int numOfStrips);
+        
         void addStrip(uint8_t dataPin);
         void addStrip(uint8_t dataPin, std::vector<CRGB> leds);
         void addStrip(uint8_t dataPin, CRGB *leds, unsigned int numOfLeds);
