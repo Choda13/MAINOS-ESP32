@@ -1,6 +1,8 @@
 #include "FastLED.h"
 #include <vector>
 
+
+//TODO: Return something meaningful instead of void
 class LedStrip
 {
 public:
