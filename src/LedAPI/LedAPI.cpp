@@ -78,5 +78,22 @@ api::APIResponse LedAPI::LedAPI::changePixel(Command command)
 }
 api::APIResponse LedAPI::LedAPI::show(Command command)
 {
+    auto arguments = command.Arguments;
+    api::APIResponse response(command);
+    
+    if(arguments.size() < sizeof(uint8_t))
+    {
+        response.statusCode = codes::NotEnoughArguments;
+        return response;
+    }
 
+    uint8_t stripIndex = TypeConversions::bytes_to_type<uint8_t>(arguments);
+    if(Leds.strips.size() <= stripIndex)
+    {
+        response.statusCode = codes::OutOfRange;
+        return response;
+    }
+
+    Leds.strips.at(stripIndex).show();
+    return response;
 }

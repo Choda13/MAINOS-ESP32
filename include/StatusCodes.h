@@ -5,6 +5,7 @@ namespace codes {
 		None,
 		AlreadyExist,
 		NotFound,
-		OutOfRange
+		OutOfRange,
+		NotEnoughArguments
 	};
 }
