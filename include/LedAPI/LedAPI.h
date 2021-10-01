@@ -2,7 +2,6 @@
 #include "API/API.h"
 #include "FastLED.h"
 #include "LedLib/LedLib.h"
-#include "TypeConversions/TypeConversions.h"
 #include <vector>
 
 namespace LedAPI
@@ -13,8 +12,10 @@ namespace LedAPI
     //  2) diffrent number of bytes of arguments every overloaded command recives
     enum CommandCodes
     {
+        //Api specific commands
         listCommands=0,
         explainCommand, 
+        //Api functionality
         addStrip,
         removeStrip,
         listStrips,

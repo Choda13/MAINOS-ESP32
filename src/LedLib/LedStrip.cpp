@@ -1,5 +1,5 @@
-#include "LedLib/LedStrip.h"
-#include "LedLib/LedLib.h"
+#include "../include/LedLib/LedStrip.h"
+#include "../include/LedLib/LedLib.h"
 
 LedStrip::LedStrip(uint8_t dataPin)
 {
@@ -24,10 +24,6 @@ LedStrip::LedStrip(uint8_t dataPin, CRGB *data, int numOfLeds)
     FastLED.addLeds(controller, pixels.data(), pixels.size());   
 }
 
-unsigned int LedStrip::size()
-{
-    return pixels.size();
-}
 std::string LedStrip::toString()
 {
     std::string result="";
