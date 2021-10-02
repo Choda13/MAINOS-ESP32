@@ -1,5 +1,5 @@
-#include "../include/LedLib/LedStrip.h"
-#include "../include/LedLib/LedLib.h"
+#include "LedLib/LedStrip.h"
+#include "LedLib/LedLib.h"
 
 LedStrip::LedStrip(uint8_t dataPin)
 {

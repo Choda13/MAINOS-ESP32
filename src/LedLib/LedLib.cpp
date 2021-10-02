@@ -1,4 +1,4 @@
-#include "../include/LedLib/LedLib.h"
+#include "LedLib/LedLib.h"
 
 LedLib::Led::Led()
 {

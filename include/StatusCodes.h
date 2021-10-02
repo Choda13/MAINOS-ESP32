@@ -7,6 +7,7 @@ namespace codes {
 		OutOfRange,
 		AlreadyExist,
 		NotDefined,
-		LimitReached
+		LimitReached,
+		NonMatchungArguments
 	};
 }
