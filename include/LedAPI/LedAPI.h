@@ -55,7 +55,7 @@ namespace LedAPI
         api::APIResponse removePixel(Command command); 
         api::APIResponse changePixel(Command command); 
         api::APIResponse show(Command command);        
-
+        api::APIResponse showAll(Command command);
         std::string listStrips();
 
         int addStrip(uint8_t dataPin ,unsigned int numOfPixels=1, CRGB color=CRGB::Black);

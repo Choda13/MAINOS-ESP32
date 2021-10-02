@@ -41,6 +41,9 @@ api::APIResponse LedAPI::LedAPI::ExecuteCommand(Command command)
     case CommandCodes::show:
         response = show(command);
         break;
+    case CommandCodes::showAll:
+        response = showAll(command);
+        break;
     default:
         response.statusCode = codes::NotFound;
         break;
@@ -158,12 +161,80 @@ api::APIResponse LedAPI::LedAPI::addPixel(Command command)
 }
 api::APIResponse LedAPI::LedAPI::removePixel(Command command)
 {
+    auto res = api::APIResponse(codes::NonMatchungArguments, command);
+    auto args = command.Arguments;
+    switch (args.size())
+    {
+        case 0:
+            res.statusCode = removePixel();
+            break;
+        case sizeof(uint8_t):
+            res.statusCode = removePixel(TypeConversions::ExtractType<uint8_t>(args));
+            break;
+        case sizeof(unsigned int):
+            res.statusCode = removePixel(TypeConversions::ExtractType<unsigned int>(args));
+            break;
+        case sizeof(unsigned int) + sizeof(uint8_t):
+            res.statusCode = removePixel(TypeConversions::ExtractType<unsigned int>(args),
+                                        TypeConversions::ExtractType<uint8_t>(args));
+            break;
+    }
+    return res;
 }
 api::APIResponse LedAPI::LedAPI::changePixel(Command command)
 {
+    auto res = api::APIResponse(codes::NonMatchungArguments, command);
+    auto args = command.Arguments;
+    switch (args.size())
+    {
+        case sizeof(CRGB) + sizeof(int):
+            res.statusCode = changePixel(TypeConversions::ExtractType<CRGB>(args),
+                                        TypeConversions::ExtractType<int>(args));
+            break;
+        case sizeof(CRGB) + sizeof(int) + sizeof(uint8_t):
+        res.statusCode = changePixel(TypeConversions::ExtractType<CRGB>(args),
+                                    TypeConversions::ExtractType<int>(args),
+                                    TypeConversions::ExtractType<uint8_t>(args));
+            break;
+    }
+    return res;
 }
 api::APIResponse LedAPI::LedAPI::show(Command command)
 {
+    auto res = api::APIResponse(codes::NonMatchungArguments, command);
+    auto args = command.Arguments;
+    switch(args.size())
+    {
+        case 0:
+            res.statusCode = show();
+            break;
+        case sizeof(CRGB):
+            res.statusCode = show(TypeConversions::ExtractType<CRGB>(args));
+            break;
+        case sizeof(uint8_t):
+            res.statusCode = show(TypeConversions::ExtractType<uint8_t>(args));
+            break;
+        case sizeof(uint8_t) + sizeof(CRGB):
+            res.statusCode = show(TypeConversions::ExtractType<uint8_t>(args),
+                                  TypeConversions::ExtractType<CRGB>(args));
+            break;
+    }
+    return res;
+}
+api::APIResponse LedAPI::LedAPI::showAll(Command command)
+{
+    auto res = api::APIResponse(codes::NonMatchungArguments, command);
+    auto args=command.Arguments;
+    switch (args.size())
+    {
+        case 0:
+            res.statusCode = showAll();
+            break;
+        case sizeof(CRGB):
+            res.statusCode = showAll(TypeConversions::ExtractType<CRGB>(args));
+            break;
+    }
+    return res;
 }
 
 std::string LedAPI::LedAPI::listStrips()
@@ -285,6 +356,7 @@ int LedAPI::LedAPI::removePixel(unsigned int pixelIndex, uint8_t stripIndex)
     if (Leds.at(stripIndex).size() <= pixelIndex)
         return codes::OutOfRange;
     Leds.at(stripIndex).removePixel(pixelIndex);
+    return codes::Success;
 }
 
 int LedAPI::LedAPI::changePixel(CRGB color, int pixelIndex)
