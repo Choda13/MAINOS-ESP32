@@ -21,6 +21,15 @@ LedLib::Led::Led(LedStrip* strips, unsigned int numOfStrips)
         this->strips.push_back(strips[i]);
 }
 
+LedStrip& LedLib::Led::at(unsigned int index)
+{
+    return strips.at(index);
+}
+unsigned int LedLib::Led::size()
+{
+    return strips.size();
+}
+
 void LedLib::Led::addStrip(uint8_t dataPin)
 {
     strips.push_back(LedStrip(dataPin));
