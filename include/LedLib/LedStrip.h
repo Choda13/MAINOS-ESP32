@@ -17,7 +17,9 @@ public:
     LedStrip(uint8_t dataPin, CRGB* data, int numOfLeds);
     //LedStrip() with chipset option
 
+    CRGB& at(unsigned int index);
     std::string toString();
+    unsigned int size();
 
     void updatePixels();
 

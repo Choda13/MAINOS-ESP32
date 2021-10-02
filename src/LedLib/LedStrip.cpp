@@ -24,6 +24,14 @@ LedStrip::LedStrip(uint8_t dataPin, CRGB *data, int numOfLeds)
     FastLED.addLeds(controller, pixels.data(), pixels.size());   
 }
 
+CRGB& LedStrip::at(unsigned int index)
+{
+    return pixels.at(index);
+}
+unsigned int LedStrip::size()
+{
+    return pixels.size();
+}
 std::string LedStrip::toString()
 {
     std::string result="";
