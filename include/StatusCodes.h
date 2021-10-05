@@ -8,6 +8,7 @@ namespace codes {
 		AlreadyExist,
 		NotDefined,
 		LimitReached,
-		NonMatchungArguments
+		NonMatchungArguments,
+		Failed
 	};
 }

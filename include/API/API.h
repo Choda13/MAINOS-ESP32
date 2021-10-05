@@ -16,7 +16,6 @@ namespace api {
 		//static virtual enum CommandCode {};
 		std::string APIName;
 
-		API();
 		API(std::string APIName);
 		virtual APIResponse ExecuteCommand(Command command);
 	};

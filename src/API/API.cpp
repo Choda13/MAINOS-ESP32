@@ -1,7 +1,5 @@
-#include "../../include/API/API.h"
-
-api::API::API(){
-}
+#include "API/API.h"
+#include "TypeConversions/TypeConversions.h"
 
 api::API::API(std::string APIName) {
 	this->APIName = APIName;
@@ -44,7 +42,10 @@ api::APIResponse::APIResponse(int statusCode, Command command, std::vector<uint8
 
 std::string api::APIResponse::toString()
 {
-	std::string res = "Response for command: \n" + command.toString() + "\n\nResponse: ";
-	res+=std::string(responseData.begin(), responseData.end());
+	std::string res = "Response for command: \n" + command.toString() + "\n\nResponse:\n";
+	res+="Status code: ";
+	res+=TypeConversions::int_to_string(this->statusCode);
+	res+="\nResponse message: ";
+	res+=std::string(this->responseData.begin(), this->responseData.end());
 	return res+"\n";
 }
