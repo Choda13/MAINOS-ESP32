@@ -6,7 +6,6 @@
 
 int mainos_init() {
 	CommandService = commserv::CommandHandler();
-	CommandService.RegisterAPI(new api::API());
 	return codes::Success;
 }
 
@@ -23,8 +22,6 @@ template<typename T>
 T bytes_to_type(std::vector<uint8_t>bytes, bool ignoreSize) {
 	T value;
 	std::copy(bytes.data(), bytes.data() + sizeof(T), reinterpret_cast<uint8_t*>(&value));
-	//if (!ignoreSize && sizeof(T) != bytes.size())
-		//Serial print "Exception at bytes_to_type(std::vector<uint8_t>bytes): bytes size doesnt equal the size of type T"
 	return value;
 }
 

@@ -15,6 +15,7 @@ public:
     LedStrip(uint8_t dataPin, int numOfLeds);
     LedStrip(uint8_t dataPin, std::vector<CRGB> data);
     LedStrip(uint8_t dataPin, CRGB* data, int numOfLeds);
+    //~LedStrip(){delete controller;}
     //LedStrip() with chipset option
 
     CRGB& at(unsigned int index);

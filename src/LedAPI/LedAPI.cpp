@@ -12,7 +12,7 @@ api::APIResponse LedAPI::LedAPI::ExecuteCommand(Command command)
     switch (command.CommandID)
     {
     case CommandCodes::listCommands:
-        //response = listCommands(command);
+        response = listCommands(command);
         break;
     case CommandCodes::explainCommand:
         // response = explainCommand(command);
@@ -51,6 +51,21 @@ api::APIResponse LedAPI::LedAPI::ExecuteCommand(Command command)
     return response;
 }
 
+api::APIResponse LedAPI::LedAPI::listCommands(Command command)
+{
+    auto res = api::APIResponse(codes::Success, command);
+    auto list = listCommands();
+    res.responseData = std::vector<uint8_t>(list.begin(), list.end());
+    return res;
+}
+
+api::APIResponse LedAPI::LedAPI::listStrips(Command command)
+{
+    auto res = api::APIResponse(codes::Success, command);
+    auto msg = listStrips();
+    res.responseData = std::vector<uint8_t>(msg.begin(), msg.end());
+    return res;
+}
 api::APIResponse LedAPI::LedAPI::addStrip(Command command)
 {
     auto res = api::APIResponse(codes::NonMatchungArguments, command);
@@ -72,13 +87,6 @@ api::APIResponse LedAPI::LedAPI::addStrip(Command command)
         Serial.println(res.statusCode);
         break;
     }
-    return res;
-}
-api::APIResponse LedAPI::LedAPI::listStrips(Command command)
-{
-    auto res = api::APIResponse(codes::Success, command);
-    auto msg = listStrips();
-    res.responseData = std::vector<uint8_t>(msg.begin(), msg.end());
     return res;
 }
 api::APIResponse LedAPI::LedAPI::removeStrip(Command command)
@@ -113,7 +121,6 @@ api::APIResponse LedAPI::LedAPI::showStripData(Command command)
     }
     return res;
 }
-
 api::APIResponse LedAPI::LedAPI::changeDefault(Command command)
 {
     auto res = api::APIResponse(codes::NonMatchungArguments, command);
@@ -420,4 +427,47 @@ int LedAPI::LedAPI::showAll(CRGB color)
     for (int i = 0; i < Leds.size(); i++)
         show(i, color);
     return codes::Success;
+}
+
+std::string LedAPI::LedAPI::listCommands(){
+    std::string msg="";
+    msg+="COMM_ID\t\tCommandName\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::listCommands);
+    msg+=" ListCommands\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::explainCommand);
+    msg+=" ExplainCommand\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::addStrip);
+    msg+=" AddStrip\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::removeStrip);
+    msg+=" RemoveStrip\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::listStrips);
+    msg+=" ListStrips\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::showStripData);
+    msg+=" ShowStripData\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::changeDefault);
+    msg+=" ChangeDefault\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::addPixel);
+    msg+=" AddPixel\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::removePixel);
+    msg+=" RemovePixel\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::changePixel);
+    msg+=" changePixel\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::show);
+    msg+=" ShowStrip\n";
+
+    msg+=TypeConversions::int_to_string(CommandCodes::showAll);
+    msg+=" ShowAllStrips\n";
+
+    return msg;
 }
