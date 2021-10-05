@@ -1,11 +1,11 @@
 #include "LedAPI/LedAPI.h"
+#include <Arduino.h>
 #include "TypeConversions/TypeConversions.h"
 
-LedAPI::LedAPI::LedAPI()
+LedAPI::LedAPI::LedAPI(std::string APIName):API(APIName)
 {
     Leds = LedLib::Led();
 }
-
 api::APIResponse LedAPI::LedAPI::ExecuteCommand(Command command)
 {
     auto response = api::APIResponse(codes::NotFound, command);
@@ -69,6 +69,7 @@ api::APIResponse LedAPI::LedAPI::addStrip(Command command)
         break;
     case sizeof(uint8_t) + sizeof(int) + sizeof(CRGB):
         res.statusCode = addStrip(TypeConversions::ExtractType<uint8_t>(args), TypeConversions::ExtractType<int>(args), TypeConversions::ExtractType<CRGB>(args));
+        Serial.println(res.statusCode);
         break;
     }
     return res;

@@ -1,10 +1,11 @@
-#include "../../include/CommandHandler/CommandHandler.h"
+#include "CommandHandler/CommandHandler.h"
+#include <Arduino.h>
 
 commserv::CommandHandler::CommandHandler() {
-	this->APIList = std::vector<api::API>();
+	this->APIList = std::vector<api::API*>();
 }
 
-commserv::CommandHandler::CommandHandler(std::vector<api::API>APIList) {
+commserv::CommandHandler::CommandHandler(std::vector<api::API*>APIList) {
 	this->APIList = APIList;
 }
 
@@ -15,8 +16,7 @@ std::vector<Command> commserv::CommandHandler::ParseBytes(std::vector<uint8_t>da
 	while (i != dataSize) {
 		Command com = Command::Decode(data);
 		if (!com.isCommandValid) {
-			//REPLACE: SerialPrint;
-			//std::cout << e1.what() << std::endl;
+			Serial.println("Command is not valid");
 			return result;
 		}
 		result.push_back(com);
@@ -44,22 +44,26 @@ std::vector<api::APIResponse> commserv::CommandHandler::HandleCommands(std::vect
 			ResponseList.push_back(api::APIResponse(codes::NotFound, *it, std::vector<uint8_t>(), response));
 		}
 		else
-			ResponseList.push_back(APIList.at(id).ExecuteCommand(*it));
+			ResponseList.push_back(APIList.at(id)->ExecuteCommand(*it));
 	}
 	return ResponseList;
 }
 
-int commserv::CommandHandler::RegisterAPI(api::API api) {
+int commserv::CommandHandler::RegisterAPI(api::API* api) {
 	for (auto it = APIList.begin(); it != APIList.end(); it++)
-		if (it->APIName == api.APIName)
+		if ((*it)->APIName == api->APIName){
+			Serial.println((*it)->APIName.c_str());
+			Serial.println(api->APIName.c_str());
 			return codes::StatusCodes::AlreadyExist;
+		}
+	Serial.println("Success");
 	APIList.push_back(api);
 	return codes::StatusCodes::Success;
 }
 
-int commserv::CommandHandler::UnregisterAPI(api::API api) {
+int commserv::CommandHandler::UnregisterAPI(api::API* api) {
 	for (auto it = APIList.begin(); it != APIList.end(); it++)
-		if (it->APIName == api.APIName) {
+		if ((*it)->APIName == api->APIName) {
 			APIList.erase(it);
 			return codes::StatusCodes::Success;
 		}

@@ -14,7 +14,7 @@ namespace api {
 	class API {
 	public:
 		//static virtual enum CommandCode {};
-		std::string APIName = "Base_API_Class";
+		std::string APIName;
 
 		API();
 		API(std::string APIName);
@@ -35,5 +35,7 @@ namespace api {
 		APIResponse(int statusCode, Command command);
 		APIResponse(int statusCode, Command command, std::vector<uint8_t>systemData);
 		APIResponse(int statusCode, Command command, std::vector<uint8_t>systemData, std::vector<uint8_t>responseData);
+
+		std::string toString();
 	};
 }

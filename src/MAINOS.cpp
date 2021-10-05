@@ -6,7 +6,7 @@
 
 int mainos_init() {
 	CommandService = commserv::CommandHandler();
-	CommandService.RegisterAPI(api::API());
+	CommandService.RegisterAPI(new api::API());
 	return codes::Success;
 }
 

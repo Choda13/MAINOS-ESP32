@@ -1,7 +1,9 @@
-#include "../../include/MAINOS.h"
-#include "../../include/CommandHandler/Command.h"
-#include "../../include/TypeConversions/TypeConversions.h"
+#include "MAINOS.h"
+#include "CommandHandler/Command.h"
+#include "TypeConversions/TypeConversions.h"
 #include <iostream>
+#include <Arduino.h>
+
 using namespace TypeConversions;
 Command::Command(std::vector<uint8_t> bytes) {
 	*this = Command::Decode(bytes);
@@ -51,6 +53,8 @@ Command Command::Decode(std::vector<uint8_t> data) {
 
 	//Creates zero initialized Command with isCommandValid flag set to zero if there is not enough data to create object
 	if (data.size() - HEADER_SIZE < ArgsSize) {
+		Serial.print("\nCommand size: ");
+		Serial.println(data.size());
 		auto com = Command(0, 0, std::vector<uint8_t>());
 		com.isCommandValid = false;
 		return com;

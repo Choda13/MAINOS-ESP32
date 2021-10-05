@@ -35,9 +35,8 @@ namespace LedAPI
         LedLib::Led Leds;
         LedStrip *defaultStrip = NULL;
         uint8_t defaultIndex = 255;
-        std::string APIName = "Led API";
 
-        LedAPI();
+        LedAPI(std::string APIName="LedAPI");
         api::APIResponse ExecuteCommand(Command command);
 
         //TODO: Argument parser

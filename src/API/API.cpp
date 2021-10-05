@@ -41,3 +41,10 @@ api::APIResponse::APIResponse(int statusCode, Command command, std::vector<uint8
 	this->systemData = systemData;
 	this->responseData = responseData;
 }
+
+std::string api::APIResponse::toString()
+{
+	std::string res = "Response for command: \n" + command.toString() + "\n\nResponse: ";
+	res+=std::string(responseData.begin(), responseData.end());
+	return res+"\n";
+}
