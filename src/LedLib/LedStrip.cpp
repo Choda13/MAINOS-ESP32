@@ -1,26 +1,32 @@
 #include "LedLib/LedStrip.h"
 #include "LedLib/LedLib.h"
+#include "TypeConversions/TypeConversions.h"
+#include <Arduino.h>
 
 LedStrip::LedStrip(uint8_t dataPin)
 {
+    this->dataPin = dataPin;
     controller = LedLib::CreateController(dataPin);
     FastLED.addLeds(controller, pixels.data(), pixels.size());
 }
 LedStrip::LedStrip(uint8_t dataPin, int numOfLeds){
+    this->dataPin = dataPin;
     controller = LedLib::CreateController(dataPin);
     pixels = std::vector<CRGB>(numOfLeds, CRGB::Black);
     FastLED.addLeds(controller, pixels.data(), pixels.size());
 }
 LedStrip::LedStrip(uint8_t dataPin, std::vector<CRGB> data)
 {
-    pixels = data;
+    this->dataPin = dataPin;
     controller = LedLib::CreateController(dataPin);
+    pixels = data;
     FastLED.addLeds(controller, pixels.data(), pixels.size());
 }
 LedStrip::LedStrip(uint8_t dataPin, CRGB *data, int numOfLeds)
 {
-    pixels = std::vector<CRGB>(dataPin, numOfLeds);
+    this->dataPin = dataPin;
     controller = LedLib::CreateController(dataPin);
+    pixels = std::vector<CRGB>(dataPin, numOfLeds);
     FastLED.addLeds(controller, pixels.data(), pixels.size());   
 }
 
@@ -35,8 +41,8 @@ unsigned int LedStrip::size()
 std::string LedStrip::toString()
 {
     std::string result="";
-    result+="\nData pin: " + this->dataPin;
-    result+="\nNum. of pixels: " + this->pixels.size();
+    result+="\nData pin: " + TypeConversions::int_to_string(this->dataPin);
+    result+="\nNum. of pixels: " + TypeConversions::int_to_string(this->pixels.size());
     result+="\n";
     return result;
 }

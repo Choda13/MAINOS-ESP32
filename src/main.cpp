@@ -8,8 +8,6 @@
 
 WebServer server(80);
 
-LedAPI::LedAPI ledApi = LedAPI::LedAPI();
-LedStrip *strip;
 const char *SSID = "ZTE_H168N87DF8C";
 const char *PASS = "mojnet021";
 
@@ -22,36 +20,27 @@ bool validateHex(const char *data);
 
 void setup()
 {
-    // Serial.begin(115200);
+    Serial.begin(115200);
+    Serial.println("Begin");
+    mainos_init();
+    Serial.println(CommandService.APIList.size());
+    CommandService.RegisterAPI(new LedAPI::LedAPI());
+    Serial.println((CommandService.APIList.at(0)->APIName).c_str());
+    Serial.println(CommandService.APIList.size());
+    uint8_t status = WL_DISCONNECTED;
+    while (status != WL_CONNECTED)
+    {
+        status = connectToWifi(SSID, PASS);
+        delay(5000);
+    }
 
-    // mainos_init();
-    // Serial.println(CommandService.APIList.size());
-    // CommandService.RegisterAPI(new LedAPI::LedAPI());
-    // Serial.println((CommandService.APIList.at(0)->APIName).c_str());
-    // Serial.println(CommandService.APIList.size());
-    // uint8_t status = WL_DISCONNECTED;
-    // while (status != WL_CONNECTED)
-    // {
-    //     status = connectToWifi(SSID, PASS);
-    //     delay(5000);
-    // }
-
-    // server.begin();
-    // server.on("/api", HTTP_POST, post_page);
-    ledApi.addStrip(5, 30, CRGB::DarkGreen);
-    strip=&ledApi.Leds.strips.at(0);
-    delay(150);
+    server.begin();
+    server.on("/api", HTTP_POST, post_page);
 }
 
 void loop()
 {
-    // server.handleClient();
-    // delay(1);
-    
-    strip->show(CRGB::CadetBlue);
-    delay(150);
-    strip->show(CRGB::Black);
-    delay(150);
+    server.handleClient();
 }
 
 uint8_t connectToWifi(const char *ssid, const char *pass)

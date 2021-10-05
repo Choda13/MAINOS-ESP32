@@ -44,7 +44,7 @@ void LedLib::Led::addStrip(uint8_t dataPin, CRGB *leds, unsigned int numOfLeds)
 }
 void LedLib::Led::addStrip(uint8_t dataPin, unsigned int numOfLeds, CRGB color)
 {
-    strips.push_back(LedStrip(dataPin, std::vector<CRGB>(color, numOfLeds)));
+    strips.push_back(LedStrip(dataPin, std::vector<CRGB>(numOfLeds, color)));
 }
 
 void LedLib::Led::removeStrip()
