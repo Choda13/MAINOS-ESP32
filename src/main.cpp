@@ -19,13 +19,10 @@ void post_page();
 
 std::vector<Command> ParseUrlEncoded();
 std::vector<Command> ParseJSONEncoded();
-Command jsonObject2Command(JsonObject jsonObject);
 uint8_t connectToWifi(const char *ssid, const char *pass);
-
-bool validateObject(JsonObject &obj, std::vector<std::string> keysToValidate);
-
 void webserver_init();
 
+//Entry point
 void setup()
 {
     Serial.begin(115200);
@@ -44,12 +41,21 @@ void setup()
         delay(5000);
     }
 }
-
 void loop()
 {
     server.handleClient();
 }
 
+void webserver_init()
+{
+    server.begin();
+    server.on("/api", HTTP_POST, post_page);
+    server.on("/api", HTTP_GET, post_page);
+    const char *headerkeys[] = {"User-Agent", "Cookie", "Content-Type"};
+    size_t headerkeyssize = sizeof(headerkeys) / sizeof(char *);
+    //ask server to track these headers
+    server.collectHeaders(headerkeys, headerkeyssize);
+}
 uint8_t connectToWifi(const char *ssid, const char *pass)
 {
     Serial.print("\nAttempting to connect to: ");
@@ -65,7 +71,6 @@ uint8_t connectToWifi(const char *ssid, const char *pass)
     Serial.println(ssid);
     return status;
 }
-
 void post_page()
 {
     std::string contentType;
@@ -100,8 +105,6 @@ void post_page()
     server.send(200, "text/plain", response.c_str());
     Serial.println(response.c_str());
 }
-
-
 
 std::vector<Command> ParseUrlEncoded()
 {
@@ -201,47 +204,4 @@ std::vector<Command> ParseJSONEncoded()
         commands.push_back(jsonObject2Command(jsonObject));
     }
     return commands;
-}
-
-bool validateObject(JsonObject &obj, std::vector<std::string> keysToValidate)
-{
-    for (auto &&i : keysToValidate)
-        if (!obj.containsKey(i))
-            return false;
-    return true;
-}
-
-Command jsonObject2Command(JsonObject jsonObject)
-{
-    uint8_t API_ID = jsonObject["api"];
-    uint8_t CMD_ID = jsonObject["command"];
-    std::string args = jsonObject["args"];
-    std::vector<uint8_t> bytes;
-
-    if (!args.empty())
-    {
-        if (args.length() % 2 || !validateHex(args.c_str()))
-            Serial.println("Vrednost parametara mora biti u hex formati majmune glupi");
-        else
-        {
-            bytes.resize(args.length() / 2);
-            hex2bin(args.c_str(), bytes.data());
-            Serial.println("Uspesno parsirani argumenti");
-        }
-    }
-    Serial.println(API_ID);
-    Serial.println(CMD_ID);
-
-    return Command(API_ID, CMD_ID, bytes);
-}
-
-void webserver_init()
-{
-    server.begin();
-    server.on("/api", HTTP_POST, post_page);
-    server.on("/api", HTTP_GET, post_page);
-    const char *headerkeys[] = {"User-Agent", "Cookie", "Content-Type"};
-    size_t headerkeyssize = sizeof(headerkeys) / sizeof(char *);
-    //ask server to track these headers
-    server.collectHeaders(headerkeys, headerkeyssize);
 }

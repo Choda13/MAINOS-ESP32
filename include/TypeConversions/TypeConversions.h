@@ -4,10 +4,12 @@
 #include <sstream>
 #include <iomanip>
 #include <iostream>
+#include <ArduinoJson.h>
+#include "CommandHandler/Command.h"
 
 namespace TypeConversions
 {
-	
+	//Declaration
 	template <typename T>static std::string byte2hex(T val);
 	template <typename T>static std::vector<uint8_t> type2bytes(T value);
 	template <typename T>static T bytes2type(std::vector<uint8_t> bytes, bool ignoreSize = true);
@@ -16,7 +18,10 @@ namespace TypeConversions
 	static void hex2bin(const char *src, uint8_t *target);
 	static int char2int(char input);
 	static bool validateHex(const char *data);
+	static Command jsonObject2Command(JsonObject jsonObject);
+	static bool validateObject(JsonObject &obj, std::vector<std::string> keysToValidate);
 
+	//Definition
 	template <typename T>static std::string byte2hex(T val)
 	{
 		std::string result = "";
@@ -83,6 +88,36 @@ namespace TypeConversions
 				return false;
 			data++;
 		}
+		return true;
+	}
+	static Command jsonObject2Command(JsonObject jsonObject)
+	{
+		uint8_t API_ID = jsonObject["api"];
+		uint8_t CMD_ID = jsonObject["command"];
+		std::string args = jsonObject["args"];
+		std::vector<uint8_t> bytes;
+
+		if (!args.empty())
+		{
+			if (args.length() % 2 || !validateHex(args.c_str()))
+				Serial.println("Vrednost parametara mora biti u hex formati majmune glupi");
+			else
+			{
+				bytes.resize(args.length() / 2);
+				hex2bin(args.c_str(), bytes.data());
+				Serial.println("Uspesno parsirani argumenti");
+			}
+		}
+		Serial.println(API_ID);
+		Serial.println(CMD_ID);
+
+		return Command(API_ID, CMD_ID, bytes);
+	}
+	static bool validateObject(JsonObject &obj, std::vector<std::string> keysToValidate)
+	{
+		for (auto &&i : keysToValidate)
+			if (!obj.containsKey(i))
+				return false;
 		return true;
 	}
 }
