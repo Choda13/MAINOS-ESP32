@@ -22,7 +22,7 @@ std::vector<uint8_t> Command::Encode() {
 std::vector<uint8_t> Command::Encode(Command command) {
 	int argsSize = command.Arguments.size();
 	std::vector<uint8_t> Result;
-	std::vector<uint8_t> sizeInBytes = type_to_bytes(argsSize);
+	std::vector<uint8_t> sizeInBytes = type2bytes(argsSize);
 	Result.push_back(command.ApiID);
 	Result.push_back(command.CommandID);
 	Result.insert(Result.end(), sizeInBytes.begin(), sizeInBytes.end());
@@ -42,13 +42,13 @@ Command Command::Decode(std::vector<uint8_t> data) {
 		return com;
 	}
 	
-	uint8_t ApiID = bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ApiID)));
+	uint8_t ApiID = bytes2type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ApiID)));
 	position += sizeof(ApiID);
 
-	uint8_t CommandID = bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(CommandID)));
+	uint8_t CommandID = bytes2type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(CommandID)));
 	position += sizeof(CommandID);
 
-	unsigned int ArgsSize = bytes_to_type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ArgsSize)));
+	unsigned int ArgsSize = bytes2type<uint8_t>(std::vector<uint8_t>(data.begin() + position, data.begin() + position + sizeof(ArgsSize)));
 	position += sizeof(ArgsSize);
 
 	//Creates zero initialized Command with isCommandValid flag set to zero if there is not enough data to create object
@@ -71,13 +71,13 @@ std::string Command::toString() {
 	std::string result = "";
 	std::string hexvalues = "";
 	
-	result += "API ID: " + int_to_string(ApiID) + "\n";
-	result += "Command ID: " + int_to_string(CommandID) + "\n";
-	result += "Size of args: " + int_to_string(Arguments.size()) + "\n";
+	result += "API ID: " + int2string(ApiID) + "\n";
+	result += "Command ID: " + int2string(CommandID) + "\n";
+	result += "Size of args: " + int2string(Arguments.size()) + "\n";
 	result += "Hexadecimal representaion of arguments:\n";
 	
 	for (unsigned int i = 0; i < Arguments.size(); i++) {
-		hexvalues += byte_to_hex<uint8_t>(Arguments.at(i));
+		hexvalues += byte2hex<uint8_t>(Arguments.at(i));
 		switch (i % 8) {
 			case 7:hexvalues += '\n'; break;
 			case 3:	hexvalues += "  "; break;

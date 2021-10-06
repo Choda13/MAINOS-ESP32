@@ -41,8 +41,8 @@ unsigned int LedStrip::size()
 std::string LedStrip::toString()
 {
     std::string result="";
-    result+="\nData pin: " + TypeConversions::int_to_string(this->dataPin);
-    result+="\nNum. of pixels: " + TypeConversions::int_to_string(this->pixels.size());
+    result+="\nData pin: " + TypeConversions::int2string(this->dataPin);
+    result+="\nNum. of pixels: " + TypeConversions::int2string(this->pixels.size());
     result+="\n";
     return result;
 }

@@ -44,7 +44,7 @@ std::string api::APIResponse::toString()
 {
 	std::string res = "Response for command: \n" + command.toString() + "\n\nResponse:\n";
 	res+="Status code: ";
-	res+=TypeConversions::int_to_string(this->statusCode);
+	res+=TypeConversions::int2string(this->statusCode);
 	res+="\nResponse message: ";
 	res+=std::string(this->responseData.begin(), this->responseData.end());
 	return res+"\n";

@@ -7,27 +7,20 @@
 
 namespace TypeConversions
 {
-	static std::string int_to_string(int value);
-	template <typename T>
-	static std::string byte_to_hex(T val);
-	template <typename T>
-	static std::vector<uint8_t> type_to_bytes(T value);
-	template <typename T>
-	static T bytes_to_type(std::vector<uint8_t> bytes, bool ignoreSize = true);
-	template <typename T>
-	static T ExtractType(std::vector<uint8_t> &bytes, bool ignoreSize = true);
+	
+	template <typename T>static std::string byte2hex(T val);
+	template <typename T>static std::vector<uint8_t> type2bytes(T value);
+	template <typename T>static T bytes2type(std::vector<uint8_t> bytes, bool ignoreSize = true);
+	template <typename T>static T ExtractType(std::vector<uint8_t> &bytes, bool ignoreSize = true);
+	static std::string int2string(int value);
+	static void hex2bin(const char *src, uint8_t *target);
+	static int char2int(char input);
+	static bool validateHex(const char *data);
 
-	static std::string int_to_string(int value)
-	{
-		std::stringstream s;
-		s << value;
-		return s.str();
-	}
-	template <typename T>
-	static std::string byte_to_hex(T val)
+	template <typename T>static std::string byte2hex(T val)
 	{
 		std::string result = "";
-		std::vector<uint8_t> bytes = type_to_bytes<T>(val);
+		std::vector<uint8_t> bytes = type2bytes<T>(val);
 		char const hex_chars[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 		for (auto it = bytes.begin(); it != bytes.end(); ++it)
 		{
@@ -37,28 +30,59 @@ namespace TypeConversions
 		}
 		return result;
 	}
-	template <typename T>
-	static std::vector<uint8_t> type_to_bytes(T value)
+	template <typename T>static std::vector<uint8_t> type2bytes(T value)
 	{
 		std::vector<uint8_t> result(sizeof(T));
 		std::copy(reinterpret_cast<uint8_t *>(&value), reinterpret_cast<uint8_t *>(&value) + sizeof(T), result.data());
 		return result;
 	}
-	template <typename T>
-	static T bytes_to_type(std::vector<uint8_t> bytes, bool ignoreSize)
+	template <typename T>static T bytes2type(std::vector<uint8_t> bytes, bool ignoreSize)
 	{
 		T value;
 		std::copy(bytes.data(), bytes.data() + sizeof(T), reinterpret_cast<uint8_t *>(&value));
 		//if (!ignoreSize && sizeof(T) != bytes.size())
-		//Serial print "Exception at bytes_to_type(std::vector<uint8_t>bytes): bytes size doesnt equal the size of type T"
+		//Serial print "Exception at bytes2type(std::vector<uint8_t>bytes): bytes size doesnt equal the size of type T"
 		return value;
 	}
-	template <typename T>
-	static T ExtractType(std::vector<uint8_t> &bytes, bool ignoreSize)
+	template <typename T>static T ExtractType(std::vector<uint8_t> &bytes, bool ignoreSize)
 	{
-		auto value = bytes_to_type<T>(bytes);
-		for(int i=0; i<sizeof(T); i++)
+		auto value = bytes2type<T>(bytes);
+		for (int i = 0; i < sizeof(T); i++)
 			bytes.erase(bytes.begin());
 		return value;
+	}
+	static std::string int2string(int value)
+	{
+		std::stringstream s;
+		s << value;
+		return s.str();
+	}
+	static void hex2bin(const char *src, uint8_t *target)
+	{
+		while (*src && src[1])
+		{
+			*(target++) = char2int(*src) * 16 + char2int(src[1]);
+			src += 2;
+		}
+	}
+	static int char2int(char input)
+	{
+		if (input >= '0' && input <= '9')
+			return input - '0';
+		if (input >= 'A' && input <= 'F')
+			return input - 'A' + 10;
+		if (input >= 'a' && input <= 'f')
+			return input - 'a' + 10;
+		return -1;
+	}
+	static bool validateHex(const char *data)
+	{
+		while (*data)
+		{
+			if (char2int(data[0]) == -1)
+				return false;
+			data++;
+		}
+		return true;
 	}
 }

@@ -8,6 +8,8 @@
 #include "LedLib/LedStrip.h"
 #include "ArduinoJson.h"
 
+using namespace TypeConversions;
+
 WebServer server(80);
 
 const char *SSID = "ZTE_H168N87DF8C";
@@ -20,10 +22,9 @@ std::vector<Command> ParseJSONEncoded();
 Command jsonObject2Command(JsonObject jsonObject);
 uint8_t connectToWifi(const char *ssid, const char *pass);
 
-int char2int(char input);
-void hex2bin(const char *src, uint8_t *target);
-bool validateHex(const char *data);
 bool validateObject(JsonObject &obj, std::vector<std::string> keysToValidate);
+
+void webserver_init();
 
 void setup()
 {
@@ -33,6 +34,7 @@ void setup()
     Serial.println("Begin");
 
     mainos_init();
+    webserver_init();
     CommandService.RegisterAPI(new LedAPI::LedAPI());
 
     uint8_t status = WL_DISCONNECTED;
@@ -41,14 +43,6 @@ void setup()
         status = connectToWifi(SSID, PASS);
         delay(5000);
     }
-
-    server.begin();
-    server.on("/api", HTTP_POST, post_page);
-    server.on("/api", HTTP_GET, post_page);
-    const char *headerkeys[] = {"User-Agent", "Cookie", "Content-Type"};
-    size_t headerkeyssize = sizeof(headerkeys) / sizeof(char *);
-    //ask server to track these headers
-    server.collectHeaders(headerkeys, headerkeyssize);
 }
 
 void loop()
@@ -107,36 +101,7 @@ void post_page()
     Serial.println(response.c_str());
 }
 
-int char2int(char input)
-{
-    if (input >= '0' && input <= '9')
-        return input - '0';
-    if (input >= 'A' && input <= 'F')
-        return input - 'A' + 10;
-    if (input >= 'a' && input <= 'f')
-        return input - 'a' + 10;
-    return -1;
-}
 
-void hex2bin(const char *src, uint8_t *target)
-{
-    while (*src && src[1])
-    {
-        *(target++) = char2int(*src) * 16 + char2int(src[1]);
-        src += 2;
-    }
-}
-
-bool validateHex(const char *data)
-{
-    while (*data)
-    {
-        if (char2int(data[0]) == -1)
-            return false;
-        data++;
-    }
-    return true;
-}
 
 std::vector<Command> ParseUrlEncoded()
 {
@@ -268,4 +233,15 @@ Command jsonObject2Command(JsonObject jsonObject)
     Serial.println(CMD_ID);
 
     return Command(API_ID, CMD_ID, bytes);
+}
+
+void webserver_init()
+{
+    server.begin();
+    server.on("/api", HTTP_POST, post_page);
+    server.on("/api", HTTP_GET, post_page);
+    const char *headerkeys[] = {"User-Agent", "Cookie", "Content-Type"};
+    size_t headerkeyssize = sizeof(headerkeys) / sizeof(char *);
+    //ask server to track these headers
+    server.collectHeaders(headerkeys, headerkeyssize);
 }

@@ -253,7 +253,7 @@ std::string LedAPI::LedAPI::listStrips()
     result += "\nStrips: \n";
     for (auto &&i : Leds.strips)
     {
-        result += "\nStrip at index: " + count;
+        result += "\nStrip at index: " + TypeConversions::int2string(count);
         result += i.toString();
         count++;
     }
@@ -433,40 +433,40 @@ std::string LedAPI::LedAPI::listCommands(){
     std::string msg="";
     msg+="COMM_ID\t\tCommandName\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::listCommands);
+    msg+=TypeConversions::int2string(CommandCodes::listCommands);
     msg+=" ListCommands\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::explainCommand);
+    msg+=TypeConversions::int2string(CommandCodes::explainCommand);
     msg+=" ExplainCommand\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::addStrip);
+    msg+=TypeConversions::int2string(CommandCodes::addStrip);
     msg+=" AddStrip\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::removeStrip);
+    msg+=TypeConversions::int2string(CommandCodes::removeStrip);
     msg+=" RemoveStrip\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::listStrips);
+    msg+=TypeConversions::int2string(CommandCodes::listStrips);
     msg+=" ListStrips\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::showStripData);
+    msg+=TypeConversions::int2string(CommandCodes::showStripData);
     msg+=" ShowStripData\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::changeDefault);
+    msg+=TypeConversions::int2string(CommandCodes::changeDefault);
     msg+=" ChangeDefault\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::addPixel);
+    msg+=TypeConversions::int2string(CommandCodes::addPixel);
     msg+=" AddPixel\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::removePixel);
+    msg+=TypeConversions::int2string(CommandCodes::removePixel);
     msg+=" RemovePixel\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::changePixel);
+    msg+=TypeConversions::int2string(CommandCodes::changePixel);
     msg+=" changePixel\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::show);
+    msg+=TypeConversions::int2string(CommandCodes::show);
     msg+=" ShowStrip\n";
 
-    msg+=TypeConversions::int_to_string(CommandCodes::showAll);
+    msg+=TypeConversions::int2string(CommandCodes::showAll);
     msg+=" ShowAllStrips\n";
 
     return msg;
