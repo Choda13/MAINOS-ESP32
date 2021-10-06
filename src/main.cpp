@@ -17,22 +17,24 @@ void post_page();
 
 std::vector<Command> ParseUrlEncoded();
 std::vector<Command> ParseJSONEncoded();
-
+Command jsonObject2Command(JsonObject jsonObject);
 uint8_t connectToWifi(const char *ssid, const char *pass);
 
 int char2int(char input);
 void hex2bin(const char *src, uint8_t *target);
 bool validateHex(const char *data);
+bool validateObject(JsonObject &obj, std::vector<std::string> keysToValidate);
 
 void setup()
 {
     Serial.begin(115200);
+    Serial.print(__PRETTY_FUNCTION__);
+    Serial.print(": ");
     Serial.println("Begin");
+
     mainos_init();
-    Serial.println(CommandService.APIList.size());
     CommandService.RegisterAPI(new LedAPI::LedAPI());
-    Serial.println((CommandService.APIList.at(0)->APIName).c_str());
-    Serial.println(CommandService.APIList.size());
+
     uint8_t status = WL_DISCONNECTED;
     while (status != WL_CONNECTED)
     {
@@ -42,6 +44,11 @@ void setup()
 
     server.begin();
     server.on("/api", HTTP_POST, post_page);
+    server.on("/api", HTTP_GET, post_page);
+    const char *headerkeys[] = {"User-Agent", "Cookie", "Content-Type"};
+    size_t headerkeyssize = sizeof(headerkeys) / sizeof(char *);
+    //ask server to track these headers
+    server.collectHeaders(headerkeys, headerkeyssize);
 }
 
 void loop()
@@ -71,20 +78,33 @@ void post_page()
     std::vector<Command> commands;
 
     contentType = server.header("Content-Type").c_str();
-    if(contentType == "application/json")
+    Serial.print("Num of headers: ");
+    Serial.println(server.headers());
+    Serial.println(server.hostHeader());
+
+    for (int i = 0; i < server.headers(); i++)
+        Serial.println(server.header(i).c_str());
+
+    if (contentType == "application/json")
         commands = commands = ParseJSONEncoded();
-    else if(contentType == "application/x-www-form-urlencoded")
+    else if (contentType == "application/x-www-form-urlencoded")
         commands = ParseUrlEncoded();
     else
         commands = ParseUrlEncoded();
 
     auto result = CommandService.HandleCommands(commands);
+    Serial.print("Number of commands: ");
+    Serial.println(commands.size());
+
+    Serial.print("Number of responses: ");
+    Serial.println(result.size());
 
     std::string response = "";
     for (auto &&i : result)
         response += i.toString();
 
     server.send(200, "text/plain", response.c_str());
+    Serial.println(response.c_str());
 }
 
 int char2int(char input)
@@ -126,6 +146,8 @@ std::vector<Command> ParseUrlEncoded()
     String args;
     std::vector<Command> commands;
 
+    Serial.println("Parsing url encoded data");
+
     if (!server.hasArg("API_ID") || !server.hasArg("COMM_ID"))
         server.send(400, "text/plain", "Moras poslati bar dva parametra, API_ID i COMM_ID");
 
@@ -154,13 +176,18 @@ std::vector<Command> ParseUrlEncoded()
 }
 std::vector<Command> ParseJSONEncoded()
 {
-    StaticJsonDocument<4096> doc;
+    DynamicJsonDocument doc(4096);
     std::vector<Command> commands;
     String json = server.arg("plain");
+    std::string msg;
+
+    std::vector<std::string> objectKeys = {"api", "command"};
+
+    Serial.println("Parsing JSON data");
 
     if (json.length() > 4096)
     {
-        server.send(400, "Preveliki JSON, salji JSON dokument koji nije veci od 4096 bajtova");
+        Serial.println("JSON je malo velik ;)");
         return commands;
     }
 
@@ -168,13 +195,77 @@ std::vector<Command> ParseJSONEncoded()
     // Test if parsing succeeds.
     if (error)
     {
-        std::string msg = "deserializeJson() failed: ";
-        msg+=error.c_str();
+        msg = "deserializeJson() failed: ";
+        msg += error.c_str();
         Serial.println(msg.c_str());
-        server.send(500, msg.c_str());
         return commands;
     }
 
-    return commands;
+    if (doc.is<JsonArray>())
+    {
+        msg = "JSON document contains list of commands";
+        Serial.println(msg.c_str());
+        JsonObject jsonObject;
 
+        for (int i = 0; i < doc.size(); i++)
+        {
+            jsonObject = doc[i];
+            if (!validateObject(jsonObject, objectKeys))
+            {
+                msg = "Objekat u json fajlu nije validan\n";
+                Serial.println(msg.c_str());
+                continue;
+            }
+
+            auto command = jsonObject2Command(jsonObject);
+            commands.push_back(command);
+        }
+    }
+    else
+    {
+        msg = "JSOC document contains only object";
+        Serial.println(msg.c_str());
+
+        auto jsonObject = doc.as<JsonObject>();
+
+        if (!validateObject(jsonObject, objectKeys))
+        {
+            msg = "Objekat u json fajlu nije validan\n";
+            Serial.println(msg.c_str());
+        }
+        commands.push_back(jsonObject2Command(jsonObject));
+    }
+    return commands;
+}
+
+bool validateObject(JsonObject &obj, std::vector<std::string> keysToValidate)
+{
+    for (auto &&i : keysToValidate)
+        if (!obj.containsKey(i))
+            return false;
+    return true;
+}
+
+Command jsonObject2Command(JsonObject jsonObject)
+{
+    uint8_t API_ID = jsonObject["api"];
+    uint8_t CMD_ID = jsonObject["command"];
+    std::string args = jsonObject["args"];
+    std::vector<uint8_t> bytes;
+
+    if (!args.empty())
+    {
+        if (args.length() % 2 || !validateHex(args.c_str()))
+            Serial.println("Vrednost parametara mora biti u hex formati majmune glupi");
+        else
+        {
+            bytes.resize(args.length() / 2);
+            hex2bin(args.c_str(), bytes.data());
+            Serial.println("Uspesno parsirani argumenti");
+        }
+    }
+    Serial.println(API_ID);
+    Serial.println(CMD_ID);
+
+    return Command(API_ID, CMD_ID, bytes);
 }
