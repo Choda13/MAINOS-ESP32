@@ -31,7 +31,6 @@ void setup()
     Serial.println("Begin");
 
     mainos_init();
-    webserver_init();
     CommandService.RegisterAPI(new LedAPI::LedAPI());
 
     uint8_t status = WL_DISCONNECTED;
@@ -40,6 +39,8 @@ void setup()
         status = connectToWifi(SSID, PASS);
         delay(5000);
     }
+
+    webserver_init();
 }
 void loop()
 {
